@@ -14,7 +14,7 @@
 **Warden uses [google code style formatting.][link2] Some examples of this are listed below:**
 
 ```java
-if(true) {
+if (true) {
   System.out.println("Braces are used even where optional.");
 }
 ```
