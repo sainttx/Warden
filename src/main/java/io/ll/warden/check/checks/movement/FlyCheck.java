@@ -22,9 +22,8 @@ import io.ll.warden.utils.Timer;
  * Project: Warden
  * Usage: SIR STOP BREAKING GRAVITY.
  *
- * This is a simple fly check. This checks work by checking the closest block to you
- * aka your distance from the ground. We then check how long you've been above the ground for too
- * long.
+ * This is a simple fly check. This checks work by checking the closest block to you aka your
+ * distance from the ground. We then check how long you've been above the ground for too long.
  */
 public class FlyCheck extends Check implements Listener {
 
@@ -50,27 +49,29 @@ public class FlyCheck extends Check implements Listener {
   @EventHandler
   public void onMove(PlayerTrueMoveEvent event) {
     UUID u = event.getPlayer().getUniqueId();
-    if(block == null) {
-      block = BlockUtilities.get();
-    }
-    if(move == null) {
-      move = MovementHelper.get();
-    }
-    if(map.containsKey(u)) {
-      Timer t = map.get(u);
-      if(!(move.getPlayerNLocation(u).getBlockY() -
-          block.getClosestGroundBlockToPlayer(event.getPlayer()).getBlockY() > 0)) {
-        map.remove(u);
+    if (shouldCheckPlayer(u)) {
+      if (block == null) {
+        block = BlockUtilities.get();
       }
-      if(t.hasReach(0.5f)) {
-        Bukkit.getPluginManager().callEvent(new CheckFailedEvent(
-            u, getRaiseLevel(), getName()
-        ));
+      if (move == null) {
+        move = MovementHelper.get();
       }
-    }else {
-      if(move.getPlayerNLocation(u).getBlockY() -
-          block.getClosestGroundBlockToPlayer(event.getPlayer()).getBlockY() > 0) {
-        map.put(u, new Timer());
+      if (map.containsKey(u)) {
+        Timer t = map.get(u);
+        if (!(move.getPlayerNLocation(u).getBlockY() -
+              block.getClosestGroundBlockToPlayer(event.getPlayer()).getBlockY() > 0)) {
+          map.remove(u);
+        }
+        if (t.hasReach(0.5f)) {
+          Bukkit.getPluginManager().callEvent(new CheckFailedEvent(
+              u, getRaiseLevel(), getName()
+          ));
+        }
+      } else {
+        if (move.getPlayerNLocation(u).getBlockY() -
+            block.getClosestGroundBlockToPlayer(event.getPlayer()).getBlockY() > 0) {
+          map.put(u, new Timer());
+        }
       }
     }
   }
