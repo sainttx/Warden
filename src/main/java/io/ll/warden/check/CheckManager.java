@@ -43,6 +43,9 @@ public class CheckManager implements Listener {
     checks.add(new GhostHitCheck());
     checks.add(new InvalidMovementCheck());
     checks.add(new NoFallCheck());
+    checks.add(new FastDropCheck());
+    checks.add(new NoPickupCheck());
+    checks.add(new FlyCheck());
   }
 
   /**

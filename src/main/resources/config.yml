@@ -213,6 +213,7 @@ SPRINTDISTANCE: 1.4
 SNEAKDISTANCE: 0.5
 BLOCKPLACEVALUE: 80
 FIGHTFREQUENCY: 100
+QUICKDROP: 100
 
 ###############################################
 #
