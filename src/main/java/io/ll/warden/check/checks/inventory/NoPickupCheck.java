@@ -55,7 +55,7 @@ public class NoPickupCheck extends Check implements Listener {
             for (Entity cItem : entities) {
               if (cItem instanceof Item) {
                 Item item = (Item) cItem;
-                if (MathHelper.getHorizontalDistance(value, item.getLocation()) > 4) {
+                if (MathHelper.getHorizontalDistance(value, item.getLocation()) < 4) {
                   Bukkit.getPluginManager().callEvent(new CheckFailedEvent(
                       key, getRaiseLevel(), getName()
                   ));
