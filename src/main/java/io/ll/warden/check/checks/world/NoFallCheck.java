@@ -12,7 +12,7 @@ import org.bukkit.plugin.PluginManager;
 
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.check.Check;
 import io.ll.warden.events.CheckFailedEvent;
 import io.ll.warden.events.FallEvent;
@@ -36,7 +36,7 @@ public class NoFallCheck extends Check implements Listener {
   }
 
   @Override
-  public void registerListeners(Warden w, PluginManager pm) {
+  public void registerListeners(WardenPlugin w, PluginManager pm) {
     pm.registerEvents(this, w);
   }
 
@@ -108,13 +108,10 @@ public class NoFallCheck extends Check implements Listener {
     Location sixAboveFinish = new Location(finish.getWorld(), finish.getX(),
                                            finish.getY() + 6, finish.getZ());
     //Time to do a super long if checking for three consecutive ladder/waters.
-    if ((isLORW(oneAboveFinish) && isLORW(twoAboveFinish) && isLORW(threeAboveFinish))
-        || (isLORW(twoAboveFinish) && isLORW(threeAboveFinish) && isLORW(fourAboveFinish))
-        || (isLORW(threeAboveFinish) && isLORW(fourAboveFinish) && isLORW(fiveAboveFinish))
-        || (isLORW(fourAboveFinish) && isLORW(fiveAboveFinish) && isLORW(sixAboveFinish))) {
-      return true;
-    }
-    return false;
+      return (isLORW(oneAboveFinish) && isLORW(twoAboveFinish) && isLORW(threeAboveFinish))
+              || (isLORW(twoAboveFinish) && isLORW(threeAboveFinish) && isLORW(fourAboveFinish))
+              || (isLORW(threeAboveFinish) && isLORW(fourAboveFinish) && isLORW(fiveAboveFinish))
+              || (isLORW(fourAboveFinish) && isLORW(fiveAboveFinish) && isLORW(sixAboveFinish));
   }
 
   /**
@@ -123,13 +120,10 @@ public class NoFallCheck extends Check implements Listener {
    * @return if the location is ladder or water.
    */
   private boolean isLORW(Location loc) {
-    if (loc.getBlock().getType() == Material.WATER || loc.getBlock().getType() ==
-                                                      Material.STATIONARY_WATER
-        || loc.getBlock().getType() == Material.LADDER ||
-        loc.getBlock().getType() == Material.VINE) {
-      return true;
-    }
-    return false;
+      return loc.getBlock().getType() == Material.WATER || loc.getBlock().getType() ==
+              Material.STATIONARY_WATER
+              || loc.getBlock().getType() == Material.LADDER ||
+              loc.getBlock().getType() == Material.VINE;
   }
 
   @Override

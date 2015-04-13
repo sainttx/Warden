@@ -4,7 +4,7 @@ import org.bukkit.plugin.PluginManager;
 
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 
 /**
  * Creator: LordLambda
@@ -35,7 +35,7 @@ public abstract class Check {
    * @param w  -> warden instance
    * @param pm -> PluginManager instance
    */
-  public abstract void registerListeners(Warden w, PluginManager pm);
+  public abstract void registerListeners(WardenPlugin w, PluginManager pm);
 
   /**
    * Get the amount this check raises a players level by

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.check.Check;
 import io.ll.warden.events.CheckFailedEvent;
 import io.ll.warden.utils.BlockUtilities;
@@ -47,7 +47,7 @@ public class XCarryCheck extends Check implements PacketListener {
   }
 
   @Override
-  public void registerListeners(Warden w, PluginManager pm) {
+  public void registerListeners(WardenPlugin w, PluginManager pm) {
     setup(w);
   }
 
@@ -61,7 +61,7 @@ public class XCarryCheck extends Check implements PacketListener {
    *
    * @param w Release the sniffing hounds!
    */
-  public void setup(Warden w) {
+  public void setup(WardenPlugin w) {
     ProtocolManager pm = w.getProtocolManager();
     pm.addPacketListener(this);
   }
@@ -119,6 +119,6 @@ public class XCarryCheck extends Check implements PacketListener {
 
   @Override
   public Plugin getPlugin() {
-    return Warden.get();
+    return WardenPlugin.get();
   }
 }

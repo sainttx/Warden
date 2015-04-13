@@ -10,7 +10,7 @@ import org.bukkit.plugin.PluginManager;
 import java.util.HashMap;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.check.Check;
 import io.ll.warden.events.CheckFailedEvent;
 import io.ll.warden.utils.Timer;
@@ -35,7 +35,7 @@ public class BlockPlaceSpeedCheck extends Check implements Listener {
   }
 
   @Override
-  public void registerListeners(Warden w, PluginManager pm) {
+  public void registerListeners(WardenPlugin w, PluginManager pm) {
     pm.registerEvents(this, w);
     MS_LIMIT = (long) w.getConfig().getInt("BLOCKPLACEVALUE");
   }

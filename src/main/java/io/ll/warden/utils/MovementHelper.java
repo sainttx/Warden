@@ -9,6 +9,7 @@ import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.injector.GamePhase;
 import com.comphenix.protocol.reflect.StructureModifier;
 
+import io.ll.warden.utils.proxy.Warden;
 import org.apache.commons.lang.BitField;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.events.FallEvent;
 import io.ll.warden.events.PlayerTrueMoveEvent;
 
@@ -32,7 +33,6 @@ import io.ll.warden.events.PlayerTrueMoveEvent;
  */
 public class MovementHelper {
 
-  private static MovementHelper instance;
   private LinkedHashMap<UUID, List<Location>> playerLocationMap;
   private LinkedHashMap<UUID, Location> startFalling;
   private List<UUID> onGroundPlayers;
@@ -41,7 +41,7 @@ public class MovementHelper {
   private ListeningWhitelist outBound;
   private ListeningWhitelist inBound;
 
-  protected MovementHelper() {
+  public MovementHelper() {
     playerLocationMap = new LinkedHashMap<UUID, List<Location>>();
     startFalling = new LinkedHashMap<UUID, Location>();
     inBound = ListeningWhitelist.newBuilder()
@@ -51,17 +51,6 @@ public class MovementHelper {
     onGroundPlayers = new ArrayList<UUID>();
     fallingPlayers = new ArrayList<UUID>();
     sprintingPlayers = new ArrayList<UUID>();
-  }
-
-  public static MovementHelper get() {
-    if (instance == null) {
-      synchronized (MovementHelper.class) {
-        if (instance == null) {
-          instance = new MovementHelper();
-        }
-      }
-    }
-    return instance;
   }
 
   /**
@@ -220,7 +209,7 @@ public class MovementHelper {
 
       @Override
       public Plugin getPlugin() {
-        return Warden.get();
+        return Warden.getPluginContainer().get();
       }
     });
   }

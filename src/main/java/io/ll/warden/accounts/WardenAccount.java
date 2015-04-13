@@ -1,6 +1,7 @@
 package io.ll.warden.accounts;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,7 +63,7 @@ public class WardenAccount {
    * @return If it's correct
    */
   public boolean passwordCorrect(byte[] hashed) {
-    return hashedPassword.equals(hashed);
+    return Arrays.equals(hashedPassword, hashed);
   }
 
   /**

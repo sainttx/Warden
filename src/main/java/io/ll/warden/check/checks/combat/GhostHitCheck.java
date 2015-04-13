@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.PluginManager;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.check.Check;
 import io.ll.warden.events.CheckFailedEvent;
 
@@ -33,7 +33,7 @@ public class GhostHitCheck extends Check implements Listener {
     super("GhostHit");
   }
 
-  public void registerListeners(Warden w, PluginManager pm) {
+  public void registerListeners(WardenPlugin w, PluginManager pm) {
     pm.registerEvents(this, w);
   }
 

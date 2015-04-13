@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.accounts.WardenAccountManager;
 import io.ll.warden.check.checks.combat.*;
 import io.ll.warden.check.checks.inventory.*;
@@ -23,13 +23,12 @@ import io.ll.warden.commands.AuthAction;
  */
 public class CheckManager implements Listener {
 
-  private static CheckManager instance;
   private List<Check> checks;
 
   /**
    * Initalize everything we need to.
    */
-  protected CheckManager() {
+  public CheckManager() {
     checks = new ArrayList<Check>();
     checks.add(new XCarryCheck());
     checks.add(new SprintCheck());
@@ -43,22 +42,6 @@ public class CheckManager implements Listener {
     checks.add(new GhostHitCheck());
     checks.add(new InvalidMovementCheck());
     checks.add(new NoFallCheck());
-  }
-
-  /**
-   * Gets the public singleton.
-   *
-   * @return Get the singleton instance.
-   */
-  public static CheckManager get() {
-    if (instance == null) {
-      synchronized (CheckManager.class) {
-        if (instance == null) {
-          instance = new CheckManager();
-        }
-      }
-    }
-    return instance;
   }
 
   /**
@@ -84,7 +67,7 @@ public class CheckManager implements Listener {
    * @param w  An instance of warden
    * @param pm An instance of the PluginManager
    */
-  public void registerListeners(Warden w, PluginManager pm) {
+  public void registerListeners(WardenPlugin w, PluginManager pm) {
     for (Check c : checks) {
       c.registerListeners(w, pm);
     }

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.accounts.WardenAccount;
 import io.ll.warden.accounts.WardenAccountManager;
 
@@ -62,7 +62,7 @@ public class AuthAction implements CommandExecutor {
       return false;
     }
     if (!(sender instanceof Player)) {
-      Warden.get().log("Console can't execute This command.");
+      WardenPlugin.get().log("Console can't execute This command.");
       return true;
     }
     if (!WardenAccountManager.get().hasWardenAccounts()) {
@@ -131,12 +131,12 @@ public class AuthAction implements CommandExecutor {
   }
 
   /**
-   * An interface for something that wants to get a callback.
+   * An interface for something that wants to getInstance a callback.
    */
   public interface AuthCallback {
 
-    public String getAuthBackName();
+    String getAuthBackName();
 
-    public void onCallback(UUID u, AuthLevel level);
+    void onCallback(UUID u, AuthLevel level);
   }
 }

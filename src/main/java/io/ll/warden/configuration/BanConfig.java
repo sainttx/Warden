@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.heuristics.BanReport;
 import io.ll.warden.heuristics.CheckFailedReport;
 import io.ll.warden.utils.jodd.JDateTime;
+import io.ll.warden.utils.proxy.Warden;
 
 /**
  * Creator: LordLambda
@@ -69,7 +70,7 @@ public class BanConfig extends Config {
     byte[] bFile = new byte[(int) file.length()];
     fis.read(bFile);
     fis.close();
-    byte[] decomp = ConfigManager.get().decompress(bFile);
+    byte[] decomp = Warden.getConfigManager().get().decompress(bFile);
     BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(decomp)));
     String line;
     while((line = br.readLine()) != null) {
@@ -123,7 +124,7 @@ public class BanConfig extends Config {
   protected void onShutdown() {
     try {
       FileOutputStream fos = new FileOutputStream(file);
-      ConfigManager cm = ConfigManager.get();
+      ConfigManager cm = Warden.getConfigManager().get();
       for(BanReport br : bans) {
         //I space it out like this so it's easier for people to follow
         //Even though a String.format() would be easier if people
@@ -154,7 +155,7 @@ public class BanConfig extends Config {
       }
       fos.close();
     }catch(IOException e1) {
-      Warden.get().log("Failed to save file...");
+      Warden.logSevere("Failed to save file...");
       e1.printStackTrace();
     }
   }

@@ -7,7 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.PluginManager;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.check.Check;
 import io.ll.warden.events.CheckFailedEvent;
 
@@ -28,7 +28,7 @@ public class SelfHitCheck extends Check implements Listener {
   }
 
   @Override
-  public void registerListeners(Warden w, PluginManager pm) {
+  public void registerListeners(WardenPlugin w, PluginManager pm) {
     pm.registerEvents(this, w);
   }
 
@@ -36,10 +36,10 @@ public class SelfHitCheck extends Check implements Listener {
   public void onDamage(EntityDamageByEntityEvent event) {
     if (event.getDamager() instanceof Player &&
         event.getEntity() instanceof Player) {
-      if (shouldCheckPlayer(((Player) event.getDamager()).getUniqueId())) {
-        if (((Player) event.getDamager()).equals((Player) event.getEntity())) {
+      if (shouldCheckPlayer(event.getDamager().getUniqueId())) {
+        if (event.getDamager().equals(event.getEntity())) {
           Bukkit.getPluginManager().callEvent(new CheckFailedEvent(
-              ((Player) event.getDamager()).getUniqueId(), getRaiseLevel(), getName()
+              event.getDamager().getUniqueId(), getRaiseLevel(), getName()
           ));
         }
       }

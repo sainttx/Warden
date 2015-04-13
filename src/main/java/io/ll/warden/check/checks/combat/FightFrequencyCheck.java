@@ -11,7 +11,7 @@ import org.bukkit.plugin.PluginManager;
 import java.util.HashMap;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.check.Check;
 import io.ll.warden.events.CheckFailedEvent;
 import io.ll.warden.utils.Timer;
@@ -37,7 +37,7 @@ public class FightFrequencyCheck extends Check implements Listener {
   }
 
   @Override
-  public void registerListeners(Warden w, PluginManager pm) {
+  public void registerListeners(WardenPlugin w, PluginManager pm) {
     MS_VALUE = w.getConfig().getInt("FIGHTFREQUENCY");
     pm.registerEvents(this, w);
   }

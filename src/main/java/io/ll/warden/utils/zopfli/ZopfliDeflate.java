@@ -8,7 +8,7 @@ package io.ll.warden.utils.zopfli;
  */
 public class ZopfliDeflate {
 
-  static enum BlockType {
+  enum BlockType {
     DYNAMIC,
     FIXED
   }

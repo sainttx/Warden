@@ -1,5 +1,6 @@
 package io.ll.warden.utils;
 
+import io.ll.warden.utils.proxy.Warden;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -17,7 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.events.PlayerTrueMoveEvent;
 import io.ll.warden.events.TrueBlockBreakEvent;
 
@@ -30,7 +31,6 @@ import io.ll.warden.events.TrueBlockBreakEvent;
  */
 public class BlockUtilities implements Listener {
 
-  private static BlockUtilities instance;
   private LinkedHashMap<UUID, List<BlockBreak>> brokenBlocks;
   private LinkedHashMap<UUID, TimerWithLoc> playersBreakingNow;
   /**
@@ -120,25 +120,9 @@ public class BlockUtilities implements Listener {
                                      Material.SAND, Material.SOUL_SAND, Material.SNOW,
                                      Material.SNOW_BLOCK};
 
-  protected BlockUtilities() {
+  public BlockUtilities() {
     brokenBlocks = new LinkedHashMap<UUID, List<BlockBreak>>();
     playersBreakingNow = new LinkedHashMap<UUID, TimerWithLoc>();
-  }
-
-  /**
-   * Get the current instance of BlockUtils
-   *
-   * @return The singleton instance of BlockUtils.
-   */
-  public static BlockUtilities get() {
-    if (instance == null) {
-      synchronized (BlockUtilities.class) {
-        if (instance == null) {
-          instance = new BlockUtilities();
-        }
-      }
-    }
-    return instance;
   }
 
   /**
@@ -225,7 +209,7 @@ public class BlockUtilities implements Listener {
    * Get a specific break timer
    *
    * @param u The player
-   * @param i The break timer to get
+   * @param i The break timer to getInstance
    * @return the specified break timer
    */
   public Timer getPlayerBlockBreakTimer(UUID u, int i) {
@@ -237,7 +221,7 @@ public class BlockUtilities implements Listener {
    * Get a specific break timer with location
    *
    * @param u The player
-   * @param i The break timer to get
+   * @param i The break timer to getInstance
    * @return the specified break timer with location
    */
   public TimerWithLoc getPlayerBlockBreakTWL(UUID u, int i) {
@@ -300,13 +284,8 @@ public class BlockUtilities implements Listener {
     return playersBreakingNow.containsKey(u);
   }
 
-  /**
-   * Setup block utilites
-   *
-   * @param w An instance of warden.
-   */
-  public void setup(Warden w) {
-    Bukkit.getServer().getPluginManager().registerEvents(this, w);
+  public void setup() {
+    Warden.getPluginContainer().get().getServer().getPluginManager().registerEvents(this, Warden.getPluginContainer().get());
   }
 
   @EventHandler
@@ -315,7 +294,7 @@ public class BlockUtilities implements Listener {
     if (playersBreakingBlock(p.getUniqueId())) {
       Location block = playersBreakingNow.get(p.getUniqueId()).getLoc();
 
-      Location player = MovementHelper.get().getPlayerNLocation(p.getUniqueId());
+      Location player = Warden.getMovementHelper().get().getPlayerNLocation(p.getUniqueId());
 
       int reachDistance = (p.getGameMode() == GameMode.CREATIVE) ? 5 : 4;
 
@@ -516,10 +495,7 @@ public class BlockUtilities implements Listener {
         }
       }
     }
-    if (isSword(item)) {
-      return true;
-    }
-    return false;
+      return isSword(item);
   }
 
   /**
@@ -864,21 +840,21 @@ public class BlockUtilities implements Listener {
   public boolean isAboveStairs(Player p) {
     final Block block = p.getLocation().getBlock();
     final Block altBlock = p.getLocation().add(0, 0.5, 0).getBlock();
-    return (BlockUtilities.get().isStair(block.getRelative(BlockFace.NORTH))
-            || BlockUtilities.get().isStair(block.getRelative(BlockFace.SOUTH))
-            || BlockUtilities.get().isStair(block.getRelative(BlockFace.EAST))
-            || BlockUtilities.get().isStair(block.getRelative(BlockFace.WEST))
-            || BlockUtilities.get().isStair(block.getRelative(BlockFace.SOUTH_WEST))
-            || BlockUtilities.get().isStair(block.getRelative(BlockFace.NORTH_WEST))
-            || BlockUtilities.get().isStair(block.getRelative(BlockFace.SOUTH_EAST))
-            || BlockUtilities.get().isStair(block.getRelative(BlockFace.NORTH_EAST))
-            || BlockUtilities.get().isStair(altBlock.getRelative(BlockFace.NORTH))
-            || BlockUtilities.get().isStair(altBlock.getRelative(BlockFace.SOUTH))
-            || BlockUtilities.get().isStair(altBlock.getRelative(BlockFace.EAST))
-            || BlockUtilities.get().isStair(altBlock.getRelative(BlockFace.WEST))
-            || BlockUtilities.get().isStair(altBlock.getRelative(BlockFace.SOUTH_WEST))
-            || BlockUtilities.get().isStair(altBlock.getRelative(BlockFace.NORTH_WEST))
-            || BlockUtilities.get().isStair(altBlock.getRelative(BlockFace.SOUTH_EAST))
-            || BlockUtilities.get().isStair(altBlock.getRelative(BlockFace.NORTH_EAST)));
+    return (this.isStair(block.getRelative(BlockFace.NORTH))
+            || this.isStair(block.getRelative(BlockFace.SOUTH))
+            || this.isStair(block.getRelative(BlockFace.EAST))
+            || this.isStair(block.getRelative(BlockFace.WEST))
+            || this.isStair(block.getRelative(BlockFace.SOUTH_WEST))
+            || this.isStair(block.getRelative(BlockFace.NORTH_WEST))
+            || this.isStair(block.getRelative(BlockFace.SOUTH_EAST))
+            || this.isStair(block.getRelative(BlockFace.NORTH_EAST))
+            || this.isStair(altBlock.getRelative(BlockFace.NORTH))
+            || this.isStair(altBlock.getRelative(BlockFace.SOUTH))
+            || this.isStair(altBlock.getRelative(BlockFace.EAST))
+            || this.isStair(altBlock.getRelative(BlockFace.WEST))
+            || this.isStair(altBlock.getRelative(BlockFace.SOUTH_WEST))
+            || this.isStair(altBlock.getRelative(BlockFace.NORTH_WEST))
+            || this.isStair(altBlock.getRelative(BlockFace.SOUTH_EAST))
+            || this.isStair(altBlock.getRelative(BlockFace.NORTH_EAST)));
   }
 }

@@ -1,57 +1,42 @@
 package io.ll.warden.storage;
 
-import org.bukkit.plugin.Plugin;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Connects to and uses a MySQL database
- *
- * @author -_Husky_-
- * @author tips48
- */
-public class MySQL extends Database {
+public class MySQL extends Storage {
 
-  private final String user;
-  private final String database;
-  private final String password;
-  private final String port;
-  private final String hostname;
+    private final String host;
+    private final String port;
+    private final String database;
+    private final String username;
+    private final String password;
 
-
-  /**
-   * Creates a new MySQL instance
-   *
-   * @param plugin   Plugin instance
-   * @param hostname Name of the host
-   * @param port     Port number
-   * @param database Database name
-   * @param username Username
-   * @param password Password
-   */
-  public MySQL(Plugin plugin, String hostname, String port, String database,
-               String username, String password) {
-    super(plugin);
-    this.hostname = hostname;
-    this.port = port;
-    this.database = database;
-    this.user = username;
-    this.password = password;
-  }
-
-  @Override
-  public Connection openConnection() throws SQLException,
-                                            ClassNotFoundException {
-    if (checkConnection()) {
-      return connection;
+    public MySQL(ConfigurationSection mySQL) {
+        this.host = mySQL.getString("host");
+        this.port = mySQL.getString("port");
+        this.database = mySQL.getString("database");
+        this.username = mySQL.getString("username");
+        this.password = mySQL.getString("password");
     }
-    Class.forName("com.mysql.jdbc.Driver");
-    connection = DriverManager.getConnection("jdbc:mysql://"
-                                             + this.hostname + ":" + this.port + "/"
-                                             + this.database,
-                                             this.user, this.password);
-    return connection;
-  }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(
+                "jdbc:mysql://"
+                        + this.host + ":"
+                        + this.port + "/"
+                        + this.database + "?autoReconnect=true&user="
+                        + this.username
+                        + (this.password == null || this.password.isEmpty()
+                        ? "" : "&password=" + this.password)
+        );
+    }
+
+    @Override
+    public StorageType getStorageType() {
+        return StorageType.MYSQL;
+    }
 }

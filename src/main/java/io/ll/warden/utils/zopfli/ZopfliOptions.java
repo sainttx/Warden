@@ -8,13 +8,13 @@ package io.ll.warden.utils.zopfli;
  */
 public class ZopfliOptions {
 
-  public static enum BlockSplitting {
+  public enum BlockSplitting {
     FIRST,
     LAST,
     NONE
   }
 
-  public static enum OutputFormat {
+  public enum OutputFormat {
     DEFLATE,
     GZIP,
     ZLIB

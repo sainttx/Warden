@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.accounts.WardenAccount;
 import io.ll.warden.accounts.WardenAccountManager;
 import io.ll.warden.utils.UUIDFetcher;
@@ -42,7 +42,7 @@ public class WardenPardon implements CommandExecutor, AuthAction.AuthCallback {
   @Override
   public boolean onCommand(CommandSender sender, Command command, String name, String[] args) {
     if (!(sender instanceof Player)) {
-      Warden.get().log("WardenPardon can only be called by a player [With appropriate perms]!");
+      WardenPlugin.get().log("WardenPardon can only be called by a player [With appropriate perms]!");
       return true;
     }
     Player pSender = (Player) sender;

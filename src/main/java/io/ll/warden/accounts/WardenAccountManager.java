@@ -1,5 +1,7 @@
 package io.ll.warden.accounts;
 
+import io.ll.warden.storage.Storage;
+import io.ll.warden.utils.proxy.Warden;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -24,9 +26,10 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import io.ll.warden.Warden;
+import io.ll.warden.WardenPlugin;
 import io.ll.warden.commands.AuthAction;
 import io.ll.warden.storage.Database;
 import io.ll.warden.utils.PasswordUtils;
@@ -44,30 +47,19 @@ public class WardenAccountManager implements CommandExecutor, Listener {
   private List<UUID> uuids;
   private boolean shouldHaveAccounts;
   private boolean blockingTor;
-  private Database db;
+  private Storage storage;
   private Thread dbRefreshThread = new Thread() {
     @Override
     public void run() {
-      try {
-        db.openConnection();
-        if (db.checkConnection()) {
-          //Create table if it doesn't exist.
-          db.querySQL("CREATE TABLE IF NOT EXISTS Warden"
+      storage.doQuery("CREATE TABLE IF NOT EXISTS Warden"
                       + "(UUID varchar(36) NOT NULL,"
                       + "RANK tinyint(1) NOT NULL,"
                       + "VERIFICATIONKEY varchar(1600) NOT NULL,"
                       + "PRIMARY KEY (UUID)"
                       + ")");
-          ResultSet rs = db.querySQL("SELECT UUID FROM Warden");
-          while (rs.next()) {
-            String s = rs.getString(1);
-            uuids.add(UUID.fromString(s));
-          }
-        }
-        db.closeConnection();
-      } catch (Exception e1) {
-        Warden.get().log(String.format("Refreshing DB Error [ %s ]",
-                                       e1.getLocalizedMessage()));
+      List<Map<String, Object>> results = storage.doQuery("SELECT UUID FROM Warden", "UUID");
+      for (Map<String, Object> setResult : results) {
+        uuids.add(UUID.fromString((String) setResult.get("UUID")));
       }
     }
   };
@@ -79,7 +71,7 @@ public class WardenAccountManager implements CommandExecutor, Listener {
     shouldHaveAccounts = false;
     wardenAccounts = new ArrayList<WardenAccount>();
     uuids = new ArrayList<UUID>();
-    db = null;
+    storage = null;
   }
 
   /**
@@ -159,10 +151,10 @@ public class WardenAccountManager implements CommandExecutor, Listener {
   /**
    * Set the databse
    *
-   * @param db Heres the database
+   * @param storage Heres the database
    */
-  public void setDB(Database db) {
-    this.db = db;
+  public void setDB(Storage storage) {
+    this.storage = storage;
     if (dbRefreshThread.isAlive()) {
       dbRefreshThread.stop();
     }
@@ -190,8 +182,8 @@ public class WardenAccountManager implements CommandExecutor, Listener {
         return true;
       }
       if (args.length != 3) {
-        Warden.get().log("Incorrect amount of arguments!");
-        Warden.get().log("Proper Usage: /rW <username> <pass> <level>");
+        Warden.logWarning("Incorrect amount of arguments!");
+        Warden.logInfo("Proper Usage: /rW <username> <pass> <level>");
       }
       String username = args[0];
       String password = PasswordUtils.hash(args[1]);
@@ -201,22 +193,17 @@ public class WardenAccountManager implements CommandExecutor, Listener {
       }
       UUID userID = Bukkit.getOfflinePlayer(username).getUniqueId();
       if (playerHasWardenAccount(userID)) {
-        Warden.get().log("User Already has an account!");
+        Warden.logWarning("User Already has an account!");
         return true;
       }
-      try {
-        db.querySQL(String.format("INSERT INTO Warden "
-                                  + "(UUID, RANK, VERIFICATIONKEY)"
-                                  + "VALUES ('%s', %d, '%s')",
-                                  userID.toString(), level.ordinal(),
-                                  password));
-        if (Bukkit.getPlayer(userID).isOnline()) {
-          WardenAccount wa = new WardenAccount(userID, level, password.getBytes());
-          wardenAccounts.add(wa);
-        }
-      } catch (Exception e1) {
-        Warden.get().log("Failed to create account!");
-        e1.printStackTrace();
+      storage.doQuery(String.format("INSERT INTO Warden "
+                      + "(UUID, RANK, VERIFICATIONKEY)"
+                      + "VALUES ('%s', %d, '%s')",
+              userID.toString(), level.ordinal(),
+              password));
+      if (Bukkit.getPlayer(userID).isOnline()) {
+        WardenAccount wa = new WardenAccount(userID, level, password.getBytes());
+        wardenAccounts.add(wa);
       }
     } else if (command.getName().equals("loginWarden") ||
                command.getName().equals("login")) {
@@ -226,7 +213,7 @@ public class WardenAccountManager implements CommandExecutor, Listener {
           if (args.length == 1) {
             p.sendMessage("Logging in...");
             try {
-              ResultSet rs = db.querySQL(String.format("SELECT VERIFICATIONKEY,"
+              List<Map<String, Object>> results = storage.doQuery(String.format("SELECT VERIFICATIONKEY,"
                                                        + " RANK "
                                                        + "FROM Warden WHERE"
                                                        + " UUID='%s'",
@@ -241,7 +228,7 @@ public class WardenAccountManager implements CommandExecutor, Listener {
                 p.sendMessage("You are now logged on!");
               }
             } catch (Exception e1) {
-              Warden.get().log(String.format("Failed to login [ %s ]",
+              WardenPlugin.get().log(String.format("Failed to login [ %s ]",
                                              e1.getLocalizedMessage()));
               e1.printStackTrace();
               p.sendMessage("Failed to login! Error!");
@@ -251,7 +238,7 @@ public class WardenAccountManager implements CommandExecutor, Listener {
           }
         }
       } else {
-        Warden.get().log("Sorry this command can't be executed from console!");
+        WardenPlugin.get().log("Sorry this command can't be executed from console!");
       }
     } else if (command.getName().equals("promoteWarden") ||
                command.getName().equals("pW")) {
@@ -262,8 +249,8 @@ public class WardenAccountManager implements CommandExecutor, Listener {
         }
       }
       if (args.length != 2) {
-        Warden.get().log("Incorrect amount of args!");
-        Warden.get().log("Try: /pW <user> <rank>");
+        WardenPlugin.get().log("Incorrect amount of args!");
+        WardenPlugin.get().log("Try: /pW <user> <rank>");
       }
       String userName = args[0];
       AuthAction.AuthLevel al = AuthAction.AuthLevel.valueOf(args[1]);
@@ -272,20 +259,20 @@ public class WardenAccountManager implements CommandExecutor, Listener {
       }
       UUID uuid = Bukkit.getPlayer(userName).getUniqueId();
       try {
-        db.querySQL(String.format("UPDATE Warden"
-                                  + " SET RANK=%d"
-                                  + " WHERE UUID='%s'",
-                                  al.ordinal(),
-                                  uuid.toString()));
+        storage.querySQL(String.format("UPDATE Warden"
+                        + " SET RANK=%d"
+                        + " WHERE UUID='%s'",
+                al.ordinal(),
+                uuid.toString()));
         //Check if he's logged in
         if (playerHasWardenAccount(uuid)) {
           //Yep he is.
           WardenAccount wa = getWardenAccount(uuid);
           wa.setLevel(al);
-          Warden.get().log("Logged in player!");
+          WardenPlugin.get().log("Logged in player!");
         }
       } catch (Exception e1) {
-        Warden.get().log("Failed to promote player!");
+        WardenPlugin.get().log("Failed to promote player!");
         e1.printStackTrace();
         return true;
       }
@@ -332,7 +319,7 @@ public class WardenAccountManager implements CommandExecutor, Listener {
               br.close();
               is.close();
             } catch (IOException e1) {
-              Warden.get().log("Failed to grab tor list!");
+              WardenPlugin.get().log("Failed to grab tor list!");
               e1.printStackTrace();
             }
           } else {
@@ -356,7 +343,7 @@ public class WardenAccountManager implements CommandExecutor, Listener {
       }.run();
     }
     try {
-      ResultSet rs = db.querySQL(String.format("SELECT * FROM Warden "
+      ResultSet rs = storage.querySQL(String.format("SELECT * FROM Warden "
                                                + "WHERE UUID=\"%s\"", p.getUniqueId()));
       if (rs.next()) {
         p.sendMessage("You have a Warden account. Please Log-In.");
