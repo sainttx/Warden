@@ -70,6 +70,11 @@ public class InvalidMovementCheck extends Check implements Listener {
     }
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
   /**
    * A slightly modified version of a function from: m1enkraftman
    *

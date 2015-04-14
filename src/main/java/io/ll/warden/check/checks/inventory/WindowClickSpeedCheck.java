@@ -61,6 +61,11 @@ public class WindowClickSpeedCheck extends Check implements PacketListener {
   }
 
   @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
+  @Override
   public void onPacketReceiving(PacketEvent event) {
     PacketType pt = event.getPacketType();
     if (shouldCheckPlayer(event.getPlayer().getUniqueId())) {

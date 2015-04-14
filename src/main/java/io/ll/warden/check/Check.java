@@ -45,6 +45,13 @@ public abstract class Check {
   public abstract float getRaiseLevel();
 
   /**
+   * Determines if a check should run if a player is in creative mode.
+   *
+   * @return If the check should run if a player is in creative mode.
+   */
+  public abstract boolean ignoreOnCreative();
+
+  /**
    * Determine if a player should be checked by this check
    *
    * @param uuid The uuid of the player

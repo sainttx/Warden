@@ -51,6 +51,11 @@ public class SpeedCheck extends Check implements Listener {
   }
 
   @Override
+  public boolean ignoreOnCreative() {
+    return true; //TODO: For now.
+  }
+
+  @Override
   public float getRaiseLevel() {
     return 1.55f;
   }
@@ -73,26 +78,23 @@ public class SpeedCheck extends Check implements Listener {
         double multi = getSpeedMultiplier(p);
         boolean inWeb = BlockUtilities.get().isPlayerInWeb(p);
 
-        if (!(p.getGameMode() == GameMode.CREATIVE)) {
-          Location now = MovementHelper.get().getPlayerNLocation(p.getUniqueId());
-          Location then = MovementHelper.get().getPlayerNMinusOneLocation(p.getUniqueId());
-          //TODO: Fix this up allows a speed of ~1.4 on pleb tier clients
-          Location calcMax = then.multiply(multi).multiply((
-                                                               p.isSprinting() ? sprintSpeed
-                                                                               : p.isSneaking()
-                                                                                 ? sneakSpeed
-                                                                                 : walkSpeed));
-          if (MathHelper.getHorizontalDistance(then, calcMax) > MathHelper.getHorizontalDistance(
-              then, now)) {
-            Bukkit.getServer().getPluginManager().callEvent(
-                new CheckFailedEvent(
-                    p.getUniqueId(), getRaiseLevel(), getName()
-                )
-            );
-          }
-        } else {
-          //Should I even do this?
+        Location now = MovementHelper.get().getPlayerNLocation(p.getUniqueId());
+        Location then = MovementHelper.get().getPlayerNMinusOneLocation(p.getUniqueId());
+        //TODO: Fix this up allows a speed of ~1.4 on pleb tier clients
+        Location calcMax = then.multiply(multi).multiply((
+                                                             p.isSprinting() ? sprintSpeed
+                                                                             : p.isSneaking()
+                                                                               ? sneakSpeed
+                                                                               : walkSpeed));
+        if (MathHelper.getHorizontalDistance(then, calcMax) > MathHelper.getHorizontalDistance(
+            then, now)) {
+          Bukkit.getServer().getPluginManager().callEvent(
+              new CheckFailedEvent(
+                  p.getUniqueId(), getRaiseLevel(), getName()
+              )
+          );
         }
+
       }
     }
   }

@@ -49,6 +49,11 @@ public class BlockReachCheck extends Check implements Listener {
     }
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
   public double getReachDistance(Player p) {
     return (p.getGameMode() == GameMode.CREATIVE ? 7.5 : 6.5);
   }

@@ -41,6 +41,11 @@ public class GhostHitCheck extends Check implements Listener {
     return 5.0f;
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
   @EventHandler
   public void onHit(EntityDamageByEntityEvent event) {
     if (event.getDamager() instanceof Player) {

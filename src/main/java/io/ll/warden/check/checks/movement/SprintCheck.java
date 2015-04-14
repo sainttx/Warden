@@ -41,6 +41,11 @@ public class SprintCheck extends Check implements Listener {
     pm.registerEvents(this, w);
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
   @EventHandler
   public void onMove(PlayerTrueMoveEvent event) {
     UUID u = event.getPlayer().getUniqueId();

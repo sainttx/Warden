@@ -42,6 +42,11 @@ public class FightFrequencyCheck extends Check implements Listener {
     pm.registerEvents(this, w);
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
   @EventHandler
   public void onHit(EntityDamageByEntityEvent event) {
     Entity e = event.getDamager();

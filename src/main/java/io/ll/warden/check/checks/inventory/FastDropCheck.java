@@ -44,6 +44,11 @@ public class FastDropCheck extends Check implements Listener {
   }
 
   @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
+  @Override
   public float getRaiseLevel() {
     return 10f;
   }

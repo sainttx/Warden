@@ -41,6 +41,11 @@ public class ReachCheck extends Check implements Listener {
     return 0.5f;
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
   @EventHandler
   public void onHit(EntityDamageByEntityEvent event) {
     Entity e = event.getDamager();

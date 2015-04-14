@@ -56,6 +56,11 @@ public class XCarryCheck extends Check implements PacketListener {
     return 5.0f;
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
   /**
    * Set up the packet sniffers
    *

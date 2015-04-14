@@ -40,6 +40,11 @@ public class BlockPlaceSpeedCheck extends Check implements Listener {
     MS_LIMIT = (long) w.getConfig().getInt("BLOCKPLACEVALUE");
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
+  }
+
   @EventHandler
   public void onBlockPlace(BlockPlaceEvent event) {
     Player p = event.getPlayer();

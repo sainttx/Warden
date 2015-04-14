@@ -42,6 +42,11 @@ public class FlyCheck extends Check implements Listener {
   }
 
   @Override
+  public boolean ignoreOnCreative() {
+    return true;
+  }
+
+  @Override
   public float getRaiseLevel() {
     return 15f;
   }

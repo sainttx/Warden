@@ -1,5 +1,8 @@
 package io.ll.warden.check;
 
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 
@@ -72,11 +75,15 @@ public class CheckManager implements Listener {
    * @return If the player based off the UUID should be checked by the passed check.
    */
   public boolean shouldCheckPlayerForCheck(UUID uuid, Check c) {
+    Player p = Bukkit.getPlayer(uuid);
+    if(p.getGameMode() == GameMode.CREATIVE && c.ignoreOnCreative()) {
+      return false;
+    }
     if (WardenAccountManager.get().playerHasWardenAccount(uuid)) {
       AuthAction.AuthLevel level = WardenAccountManager.get().getAuthLevel(uuid);
-      return level == AuthAction.AuthLevel.MODERATOR ||
+      return !(level == AuthAction.AuthLevel.MODERATOR ||
              level == AuthAction.AuthLevel.ADMIN ||
-             level == AuthAction.AuthLevel.OWNER;
+             level == AuthAction.AuthLevel.OWNER);
     }
     return true;
   }

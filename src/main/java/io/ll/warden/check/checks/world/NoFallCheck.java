@@ -70,6 +70,11 @@ public class NoFallCheck extends Check implements Listener {
     }
   }
 
+  @Override
+  public boolean ignoreOnCreative() {
+    return true;
+  }
+
   @EventHandler
   public void onServerExecuteFallDamage(EntityDamageByBlockEvent event) {
     if (event.getEntity() instanceof Player) {

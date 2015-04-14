@@ -1,8 +1,6 @@
 package io.ll.warden.check.checks.inventory;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,7 +8,7 @@ import org.bukkit.plugin.PluginManager;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.ll.warden.Warden;
 import io.ll.warden.check.Check;
@@ -18,13 +16,13 @@ import io.ll.warden.events.CheckFailedEvent;
 import io.ll.warden.events.PlayerTrueMoveEvent;
 import io.ll.warden.utils.MathHelper;
 import io.ll.warden.utils.MovementHelper;
+import io.ll.warden.utils.PlayerGroundItemsSnapshot;
 
 /**
  * Creator: LordLambda
  * Date: 4/8/2015
  * Project: Warden
- * Usage: Sir you payed for these items, you must
- * accept them.
+ * Usage: Sir you payed for these items, you must accept them.
  *
  * This is implemented on a few clients, and it's not really like useful. It's just to stop people
  * who I guess are using this. Which I mean. No real advantage, but it helps us catch people who are
@@ -36,32 +34,31 @@ public class NoPickupCheck extends Check implements Listener {
 
   private Thread checkingThread;
   private MovementHelper mh;
-  private ConcurrentHashMap<UUID, Location> locations;
+  private List<PlayerGroundItemsSnapshot> snapshots;
 
   public NoPickupCheck() {
     super("NoPickupCheck");
-    locations = new ConcurrentHashMap<UUID, Location>();
+    snapshots = new CopyOnWriteArrayList<PlayerGroundItemsSnapshot>();
     checkingThread = new Thread() {
       @Override
       public void run() {
         while (true) {
-          if (locations.isEmpty()) {
-            continue;
-          } else {
-            UUID key = locations.keys().nextElement();
-            Location value = locations.get(key);
-            locations.remove(key);
-            List<Entity> entities = value.getWorld().getEntities();
-            for (Entity cItem : entities) {
-              if (cItem instanceof Item) {
-                Item item = (Item) cItem;
-                if (MathHelper.getHorizontalDistance(value, item.getLocation()) < 4) {
+          PlayerGroundItemsSnapshot cSnapshot = snapshots.get(0);
+          if (cSnapshot != null) {
+            if (!cSnapshot.wasInventoryFull()) {
+              List<Item> items = cSnapshot.getItemSnapshot();
+              for (Item i : items) {
+                if (MathHelper.getHorizontalDistance(
+                    i.getLocation(), cSnapshot.getPlayerLocation()
+                ) < 4) {
                   Bukkit.getPluginManager().callEvent(new CheckFailedEvent(
-                      key, getRaiseLevel(), getName()
+                      cSnapshot.getPlayer(), getRaiseLevel(), getName()
                   ));
+                  break;
                 }
               }
             }
+            snapshots.remove(cSnapshot);
           }
         }
       }
@@ -72,6 +69,11 @@ public class NoPickupCheck extends Check implements Listener {
   public void registerListeners(Warden w, PluginManager pm) {
     pm.registerEvents(this, w);
     checkingThread.start();
+  }
+
+  @Override
+  public boolean ignoreOnCreative() {
+    return false;
   }
 
   @Override
@@ -86,7 +88,8 @@ public class NoPickupCheck extends Check implements Listener {
     }
     UUID u = event.getPlayer().getUniqueId();
     if (shouldCheckPlayer(u)) {
-      locations.put(u, mh.getPlayerNLocation(u));
+      snapshots.add(new PlayerGroundItemsSnapshot(event.getPlayer().getUniqueId(),
+                                                  event.getPlayer().getWorld()));
     }
   }
 }
