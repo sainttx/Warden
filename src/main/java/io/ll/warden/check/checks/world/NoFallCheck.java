@@ -52,8 +52,7 @@ public class NoFallCheck extends Check implements Listener {
       Location oneAboveFinish = new Location(finish.getWorld(), finish.getX(),
                                              finish.getY() + 1, finish.getZ());
       if (oneAboveFinish.getBlock() != null || oneAboveFinish.getBlock().getType() != Material.AIR
-          ||
-          !oneAboveFinish.getBlock().isEmpty()) {
+          || !oneAboveFinish.getBlock().isEmpty()) {
         Bukkit.getPluginManager().callEvent(new CheckFailedEvent(
             u, getRaiseLevel(), getName()
         ));

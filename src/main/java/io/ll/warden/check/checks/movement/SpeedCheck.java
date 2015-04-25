@@ -21,6 +21,7 @@ import io.ll.warden.utils.BlockUtilities;
 import io.ll.warden.utils.MathHelper;
 import io.ll.warden.utils.MovementHelper;
 import io.ll.warden.utils.Timer;
+import io.ll.warden.utils.ValuePrecomputer;
 
 /**
  * Author: LordLambda
@@ -36,6 +37,7 @@ public class SpeedCheck extends Check implements Listener {
   private double sneakSpeed;
   private double sprintSpeed;
   private LinkedHashMap<UUID, Timer> map;
+  private ValuePrecomputer vp;
 
   public SpeedCheck() {
     super("SpeedCheck");
@@ -44,6 +46,7 @@ public class SpeedCheck extends Check implements Listener {
 
   @Override
   public void registerListeners(Warden w, PluginManager pm) {
+    vp = ValuePrecomputer.get();
     walkSpeed = w.getConfig().getDouble("WALKDISTANCE");
     sneakSpeed = w.getConfig().getDouble("SNEAKDISTANCE");
     sprintSpeed = w.getConfig().getDouble("SPRINTDISTANCE");
@@ -80,7 +83,7 @@ public class SpeedCheck extends Check implements Listener {
 
         Location now = MovementHelper.get().getPlayerNLocation(p.getUniqueId());
         Location then = MovementHelper.get().getPlayerNMinusOneLocation(p.getUniqueId());
-        //TODO: Fix this up allows a speed of ~1.4 on pleb tier clients
+        /*//TODO: Fix this up allows a speed of ~1.4 on pleb tier clients
         Location calcMax = then.multiply(multi).multiply((
                                                              p.isSprinting() ? sprintSpeed
                                                                              : p.isSneaking()
@@ -93,7 +96,7 @@ public class SpeedCheck extends Check implements Listener {
                   p.getUniqueId(), getRaiseLevel(), getName()
               )
           );
-        }
+        }*/
 
       }
     }
@@ -104,10 +107,10 @@ public class SpeedCheck extends Check implements Listener {
 
     for (PotionEffect effect : p.getActivePotionEffects()) {
       if (effect.getType() == PotionEffectType.SPEED) {
-        toReturn *= 1.0f + (0.2f * (effect.getAmplifier() + 1));
+        toReturn *= vp.getSpeedValue(effect.getAmplifier());
       }
       if (effect.getType() == PotionEffectType.SLOW) {
-        toReturn *= 1.0f - (0.15f * (effect.getAmplifier() + 1));
+        toReturn *= vp.getSlownessValue(effect.getAmplifier());
       }
     }
     return toReturn;
