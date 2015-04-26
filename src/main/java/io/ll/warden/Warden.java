@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import io.ll.warden.accounts.WardenAccountManager;
 import io.ll.warden.check.CheckManager;
+import io.ll.warden.check.checks.other.LoginProtection;
 import io.ll.warden.commands.AuthAction;
 import io.ll.warden.commands.WardenPardon;
 import io.ll.warden.configuration.ConfigManager;
@@ -126,6 +127,11 @@ public class Warden extends JavaPlugin {
     log("Setting up block helper...");
     BlockUtilities.get();
     BlockUtilities.get().setup(this);
+    log("Done.");
+
+    log("Setting up Login Protection...");
+    LoginProtection.get();
+    LoginProtection.get().setup(this, getServer().getPluginManager());
     log("Done.");
 
     log("Registering Listeners...");

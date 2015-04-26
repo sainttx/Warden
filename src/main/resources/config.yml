@@ -40,6 +40,7 @@
 #  DBPort - For [MySQL] only. This would
 #    be the port (without host) to your
 #    MySQL server.
+#
 ###############################################
 DatabaseType: MySQL
 DBName: Warden
@@ -83,8 +84,7 @@ DBPort: 3306
 #    someone else logins to your account!
 #  UseWardenAccounts - Should we use
 #   Warden Accounts?
-#  BlockTor - Tor being the online anonimizing
-#   proxy. Tons of people use this.
+#
 ###############################################
 HidePlugins: True
 HidePluginMessage: This has been disabled by your administrator.
@@ -93,7 +93,6 @@ HideWardenVersion: True
 AnyoneHasAccount: False
 AccountsHavePasswords: True
 UseWardenAccounts: True
-BlockTor: False
 
 
 ###############################################
@@ -152,6 +151,7 @@ BlockTor: False
 #  Grabbing Email. (Generally the email
 #  Address).
 # GrabPass - The password for the GrabEmail
+#
 ###############################################
 ShouldSendBanReports: False
 UseHTMLEmail: True
@@ -186,15 +186,48 @@ BANAT: HIGH
 
 ###############################################
 #
-# Next in our stop is the logging phase.
-# Warden has the ability to log events, and
-# catogrizes them appropietly into subsections.
-# It provides an extreme amount of extra data
-# in some cases though! Only use if you have
-# the harddrive to back it up!
-# //TODO:
+# Next in our magical journey is login
+# protection stuff. This has to deal with
+# anything closely related to a player logging
+# in. For example wether or not to block Tor
+# A popular anonymization proxy.
+#
+#  BlockTor - Tor being the online anonimizing
+#   proxy. Tons of people use this. A proxy
+#   is a way to hide a players true ip address.
+#   thus allowing to evade IP bans.
+#  LoginProtectionBanOrWhitelist - Determines
+#   wether or not LoginProtection should ban
+#   players who are spam-botting, or if it
+#   should apply a white list. Possible values
+#   are "WHITELIST" or "BAN". If the value
+#   isn't recognized it will default to
+#   whitelisting the players.
+#  LoginWhitelistBuffer - How long the
+#   whitelist should stay up for. It is
+#   important to note that this is measured
+#   in minutes. NOTE: Decimals are not
+#   supported, and if not recognized than
+#   the default will be 2 minutes.
+#  LoginTimeBetweenLogin - How long there
+#   should at least be between each login
+#   note this is measured in seconds.
+#   NOTE: Decimals are not supported, and
+#   if not reconginzed will default to 3
+#   seconds.
+#  LoginFailureWhiteList - How many times
+#   a LoginTimeBetweenLogin isn't met before
+#   applying a whitelist/ban. Basically how
+#   many violations before throwing up a
+#   whitelist/banning people. Note: Doesn't
+#   support decimals, defaults to 5.
+#
 ###############################################
-//TODO:
+BlockTor: False
+LoginProtectionBanOrWhitelist: WHITELIST
+LoginWhitelistBuffer: 2
+LoginTimeBetweenLogin: 3
+LoginFailureWhitelist: 5
 
 ###############################################
 #
@@ -207,6 +240,7 @@ BANAT: HIGH
 # This way you have to look through the source.
 #
 # PLEASE NEVER CHANGE THESE VALUES.
+#
 ###############################################
 WALKDISTANCE: 1.0
 SPRINTDISTANCE: 1.4
@@ -223,5 +257,6 @@ QUICKDROP: 100
 #
 #  LongLogMessage: Determines if we should
 #    use a longer log prefix or not.
+#
 ###############################################
 LongLogMessage: True
