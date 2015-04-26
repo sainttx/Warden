@@ -89,6 +89,7 @@ public class LoginProtection implements Listener {
         currentFailures--;
         return;
       }
+      sinceLastJoin.reset();
       //Logging in too fast!
       currentFailures++;
       if(currentFailures >= failureBeforeWhitelist) {
