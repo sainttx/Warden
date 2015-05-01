@@ -48,7 +48,9 @@ public class LoginProtection implements Listener {
       @Override
       public void run() {
         shouldWhitelist = false;
-        currentFailures--;
+        if(currentFailures != 0) {
+        	currentFailures--;
+        }
       }
     };
   }
@@ -95,7 +97,9 @@ public class LoginProtection implements Listener {
       }
       if(sinceLastJoin.hasReachMS(timeBetweenLogin * 1000)) {
         sinceLastJoin.reset();
-        currentFailures--;
+        if(currentFailures != 0) {
+        	currentFailures--;
+        }
         return;
       }
       sinceLastJoin.reset();
@@ -121,7 +125,9 @@ public class LoginProtection implements Listener {
       }
       if(sinceLastJoin.hasReachMS(timeBetweenLogin * 1000)) {
         sinceLastJoin.reset();
-        currentFailures--;
+        if(currentFailures != 0) {
+        	currentFailures--;
+        }
         return;
       }
       sinceLastJoin.reset();
