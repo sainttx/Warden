@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -32,6 +33,7 @@ public class LoginProtection implements Listener {
   private long timeBetweenLogin;
   private long failureBeforeWhitelist;
   private long currentFailures;
+  private BukkitRunnable runnable;
   private Timer sinceLastJoin;
 
   protected LoginProtection() {
@@ -42,6 +44,13 @@ public class LoginProtection implements Listener {
     timeBetweenLogin = -1;
     failureBeforeWhitelist = -1;
     currentFailures = 0;
+    runnable = new BukkitRunnable() {
+      @Override
+      public void run() {
+        shouldWhitelist = false;
+        currentFailures--;
+      }
+    };
   }
 
   public void setup(Warden w, PluginManager pm) {
@@ -76,6 +85,32 @@ public class LoginProtection implements Listener {
     }
     return instance;
   }
+  
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onLogout(PlayerQuitEvent event) {
+    if(!whitelistUp) {
+      if(sinceLastJoin == null) {
+        sinceLastJoin = new Timer();
+        return;
+      }
+      if(sinceLastJoin.hasReachMS(timeBetweenLogin * 1000)) {
+        sinceLastJoin.reset();
+        currentFailures--;
+        return;
+      }
+      sinceLastJoin.reset();
+      runnable.cancel();
+      currentFailures++;
+      if(currentFailures >= failureBeforeWhitelist) {
+        whitelistUp = true;
+        if(!shouldWhitelist) {
+          event.getPlayer().setBanned(true);
+          Bukkit.getPluginManager().callEvent(new BanEvent(event.getPlayer().getUniqueId(),
+                                                           0xDEADBEEF));
+        }
+      }
+    }
+  }
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onLogin(PlayerLoginEvent event) {
@@ -90,21 +125,16 @@ public class LoginProtection implements Listener {
         return;
       }
       sinceLastJoin.reset();
+      runnable.cancel();
       //Logging in too fast!
       currentFailures++;
       if(currentFailures >= failureBeforeWhitelist) {
-        shouldWhitelist = true;
+        whitelistUp = true;
         if(shouldWhitelist) {
           event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, "Please try connecting later a spam"
                                                                  + "bot attack is going on right"
                                                                  + "now.");
-          new BukkitRunnable() {
-            @Override
-            public void run() {
-              shouldWhitelist = false;
-              currentFailures--;
-            }
-          }.runTaskLater(Warden.get(), 20*60*whitelistBuffer);
+         runnable.runTaskLater(Warden.get(), 20*60*whitelistBuffer);
           // ^ To explain the time on that. 20 ticks ~== 1 second.
           // So therefore 20 ticks * 60 = 1 minute.
           // 1 minute * total minutes == when to run.
