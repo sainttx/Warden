@@ -65,39 +65,38 @@ public class SpeedCheck extends Check implements Listener {
 
   @EventHandler
   public void onMoveEvent(PlayerTrueMoveEvent event) {
-    Player p = event.getPlayer();
+    final Player p = event.getPlayer();
     if (shouldCheckPlayer(p.getUniqueId())) {
       Timer t = map.get(p.getUniqueId());
       if (t.hasReach(2)) {
         t.stop();
         long timePassed = t.getFinalCheck() - t.getLastCheck();
-        long secondsPassed = timePassed * 1000;
+        final long secondsPassed = timePassed * 1000;
+        final boolean isSprinting = p.isSprinting();
+        final boolean isSneaking = p.isSneaking();
         t.reset();
+        new Thread() {
+          @Override
+          public void run() {
+            if (p.isInsideVehicle()) {
+              return;
+            }
+            double multi = getSpeedMultiplier(p);
 
-        if (p.isInsideVehicle()) {
-          return;
-        }
+            Location now = MovementHelper.get().getPlayerNLocation(p.getUniqueId());
+            Location then = MovementHelper.get().getPlayerNMinusOneLocation(p.getUniqueId());
 
-        double multi = getSpeedMultiplier(p);
-        boolean inWeb = BlockUtilities.get().isPlayerInWeb(p);
+            double distanceTraveled = MathHelper.getHorizontalDistance(then, now);
 
-        Location now = MovementHelper.get().getPlayerNLocation(p.getUniqueId());
-        Location then = MovementHelper.get().getPlayerNMinusOneLocation(p.getUniqueId());
-        /*//TODO: Fix this up allows a speed of ~1.4 on pleb tier clients
-        Location calcMax = then.multiply(multi).multiply((
-                                                             p.isSprinting() ? sprintSpeed
-                                                                             : p.isSneaking()
-                                                                               ? sneakSpeed
-                                                                               : walkSpeed));
-        if (MathHelper.getHorizontalDistance(then, calcMax) > MathHelper.getHorizontalDistance(
-            then, now)) {
-          Bukkit.getServer().getPluginManager().callEvent(
-              new CheckFailedEvent(
+            double max = Math.abs((isSprinting ? sprintSpeed : (isSneaking ? sneakSpeed
+                : walkSpeed)) * multi * secondsPassed);
+            if(distanceTraveled > max) {
+              Bukkit.getPluginManager().callEvent(new CheckFailedEvent(
                   p.getUniqueId(), getRaiseLevel(), getName()
-              )
-          );
-        }*/
-
+              ));
+            }
+          }
+        }.run();
       }
     }
   }
