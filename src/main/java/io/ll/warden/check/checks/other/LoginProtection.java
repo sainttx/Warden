@@ -95,6 +95,7 @@ public class LoginProtection implements Listener {
         sinceLastJoin = new Timer();
         return;
       }
+      runnable.cancel();
       if(sinceLastJoin.hasReachMS(timeBetweenLogin * 1000)) {
         sinceLastJoin.reset();
         if(currentFailures != 0) {
@@ -103,7 +104,6 @@ public class LoginProtection implements Listener {
         return;
       }
       sinceLastJoin.reset();
-      runnable.cancel();
       currentFailures++;
       if(currentFailures >= failureBeforeWhitelist) {
         whitelistUp = true;
@@ -123,6 +123,7 @@ public class LoginProtection implements Listener {
         sinceLastJoin = new Timer();
         return;
       }
+      runnable.cancel();
       if(sinceLastJoin.hasReachMS(timeBetweenLogin * 1000)) {
         sinceLastJoin.reset();
         if(currentFailures != 0) {
@@ -131,7 +132,6 @@ public class LoginProtection implements Listener {
         return;
       }
       sinceLastJoin.reset();
-      runnable.cancel();
       //Logging in too fast!
       currentFailures++;
       if(currentFailures >= failureBeforeWhitelist) {
