@@ -72,7 +72,7 @@ public class SpeedCheck extends Check implements Listener {
         t.stop();
         long timePassed = t.getFinalCheck() - t.getLastCheck();
         final long secondsPassed = timePassed * 1000;
-        final boolean isSprinting = p.isSprinting();
+        final boolean isSprinting = MovementHelper.get().isSprinting(p.getUniqueId());
         final boolean isSneaking = p.isSneaking();
         t.reset();
         new Thread() {
@@ -86,9 +86,13 @@ public class SpeedCheck extends Check implements Listener {
             Location now = MovementHelper.get().getPlayerNLocation(p.getUniqueId());
             Location then = MovementHelper.get().getPlayerNMinusOneLocation(p.getUniqueId());
 
+            if(then == null || now == null) {
+              return;
+            }
+
             double distanceTraveled = MathHelper.getHorizontalDistance(then, now);
 
-            double max = Math.abs((isSprinting ? sprintSpeed : (isSneaking ? sneakSpeed
+            double max = ((isSprinting ? sprintSpeed : (isSneaking ? sneakSpeed
                 : walkSpeed)) * multi * secondsPassed);
             if(distanceTraveled > max) {
               Bukkit.getPluginManager().callEvent(new CheckFailedEvent(

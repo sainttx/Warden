@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import io.ll.warden.Warden;
 import io.ll.warden.events.FallEvent;
+import io.ll.warden.events.PlayerLookEvent;
 import io.ll.warden.events.PlayerTrueMoveEvent;
 
 /**
@@ -34,6 +35,7 @@ public class MovementHelper {
 
   private static MovementHelper instance;
   private LinkedHashMap<UUID, List<Location>> playerLocationMap;
+  private LinkedHashMap<UUID, List<LookPosition>> playerLookingMap;
   private LinkedHashMap<UUID, Location> startFalling;
   private List<UUID> onGroundPlayers;
   private List<UUID> fallingPlayers;
@@ -43,6 +45,7 @@ public class MovementHelper {
 
   protected MovementHelper() {
     playerLocationMap = new LinkedHashMap<UUID, List<Location>>();
+    playerLookingMap = new LinkedHashMap<UUID, List<LookPosition>>();
     startFalling = new LinkedHashMap<UUID, Location>();
     inBound = ListeningWhitelist.newBuilder()
         .highest().gamePhase(GamePhase.PLAYING).build();
@@ -84,6 +87,16 @@ public class MovementHelper {
   public Location getPlayerNMinusOneLocation(UUID uuid) {
     List<Location> l = playerLocationMap.get(uuid);
     return l.get(l.size() - 1);
+  }
+
+  public LookPosition getPlayerNLookPosition(UUID uuid) {
+    List<LookPosition> lps = playerLookingMap.get(uuid);
+    return lps.get(lps.size());
+  }
+
+  public LookPosition getPlayerNMinusOneLookPosition(UUID uuid) {
+    List<LookPosition> lps = playerLookingMap.get(uuid);
+    return lps.get(lps.size() - 1);
   }
 
   /**
@@ -143,10 +156,24 @@ public class MovementHelper {
 
           PacketContainer pc = packetEvent.getPacket();
           StructureModifier<Double> doubles = pc.getDoubles();
+          StructureModifier<Float> floats = pc.getFloat();
 
           double x = doubles.read(1);
           double y = doubles.read(2);
           double z = doubles.read(3);
+
+          float pitch = floats.getValues().get(0);
+          float yaw = floats.getValues().get(1);
+
+          LookPosition lp = new LookPosition(pitch, yaw);
+
+          List<LookPosition> looks = playerLookingMap.get(p.getUniqueId());
+          if(looks == null) {
+            looks = new ArrayList<LookPosition>();
+          }
+          looks.add(lp);
+          playerLookingMap.put(p.getUniqueId(), looks);
+          Bukkit.getPluginManager().callEvent(new PlayerLookEvent(p, lp));
 
           BitField bf = new BitField(pc.getBytes().read(6));
           boolean xRelative = bf.isSet(0x01);
