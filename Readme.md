@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/LordLambda/Warden](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LordLambda/Warden?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-*** NOTE: Until the Cleanup Branch is pulled over (and this comment is gone). Warden is not in a usable state. It is still under heavy development, and needs a lot of work. ***
+***NOTE: Until the Cleanup Branch is pulled over (and this comment is gone). Warden is not in a usable state. It is still under heavy development, and needs a lot of work.***
 
 #### What is Warden? ####
 
